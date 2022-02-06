@@ -64,6 +64,8 @@
         <CommentList
           :artId="article.art_id"
           :contentText="article.content"
+          :list="commentList"
+          @aa="totalCommentCount = $event.total_count"
         ></CommentList>
         <!-- 评论区域 -->
 
@@ -74,10 +76,11 @@
             type="default"
             round
             size="small"
+            @click="isshow = true"
           >写评论</van-button>
           <van-icon
             name="comment-o"
-            info="123"
+            :info="totalCommentCount"
             color="#777"
           />
           <!-- <Collection></Collection> -->
@@ -86,16 +89,24 @@
             v-model="article.is_collected"
             :article-id="article.art_id"
             name="comment-o"
-            info="123"
+            :info="totalCommentCount"
             color="#777"
           ></CollectArticle>
-          <van-icon
-            color="#777"
-            name="good-job-o"
-          />
+          <LikeArticle class="name" :articleId="articleId"></LikeArticle>
           <van-icon name="share" color="#777777"></van-icon>
         </div>
-    <!-- /底部区域 -->
+        <!-- /底部区域 -->
+
+        <!-- 发布评论弹出层 -->
+        <van-popup
+          v-model="isshow"
+          position="bottom"
+        >
+          <CommentPost
+            :target="article.art_id"
+            @post-success="onPostSuccess"
+          ></CommentPost>
+        </van-popup>
       </div>
       <!-- /加载完成-文章详情 -->
 
@@ -123,6 +134,8 @@ import FollowUser from '@/components/follow-user'
 // import Collection from '@/components/collection'
 import CollectArticle from '@/components/collect-article'
 import CommentList from '@/components/comment-list'
+import LikeArticle from '@/components/like-article'
+import CommentPost from '@/components/comment-post'
 // ImagePreview({
 //   images: [
 //     'https://img01.yzcdn.cn/vant/apple-1.jpg',
@@ -140,7 +153,9 @@ export default {
   components: {
     FollowUser,
     CollectArticle,
-    CommentList
+    CommentList,
+    LikeArticle,
+    CommentPost
   },
   props: {
     articleId: {
@@ -153,7 +168,10 @@ export default {
       article: {}, // 文章详情
       loading: true, // 加载中的 loading 状态
       errStatus: 0, // 失败状态码
-      followLoading: false
+      followLoading: false,
+      totalCommentCount: 0,
+      isshow: false, // 控制发布评论的显示状态
+      commentList: [] // 评论列表
     }
   },
   computed: {},
@@ -189,7 +207,6 @@ export default {
       // 得到所有的 img 节点
       const articleContent = this.$refs['article-content']
       const imgs = articleContent.querySelectorAll('img')
-      console.log(imgs)
       const images = []
       imgs.forEach((img, index) => {
         images.push(img.src)
@@ -207,6 +224,14 @@ export default {
     onClickLeft () {
       this.$router.back()
       console.log(this.article.is_followed)
+    },
+
+    onPostSuccess (data) {
+      // 关闭弹层
+      this.isshow = false
+      // 将发布的内容显示到列表顶部
+      this.commentList.unshift(data.new_obj)
+      console.log(this.commentList)
     }
   }
 }

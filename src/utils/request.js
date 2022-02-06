@@ -17,6 +17,7 @@ const request = axios.create({
   }]
 })
 
+// 大数字问题
 const jsonStr = '{ "art_id": 123481515486413515 }'
 console.log(JSON.parse(jsonStr))
 // JSON.stringify()
