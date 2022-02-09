@@ -5,7 +5,7 @@
       class="page-nav-bar"
       left-arrow
       @click-left="onClickLeft"
-      title="黑马头条"
+      title="今日头条"
     ></van-nav-bar>
     <!-- /导航栏 -->
 
